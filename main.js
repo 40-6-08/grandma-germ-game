@@ -1,26 +1,37 @@
-const config = {
-  type: Phaser.AUTO,
-  width: window.innerWidth,
-  height: window.innerHeight,
-  parent: 'game-container',
-  physics: {
-    default: 'arcade',
-    arcade: { debug: false },
-  },
-  scale: {
-    mode: Phaser.Scale.RESIZE,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
-  },
-  scene: [StartScene, GameScene, EndScene],
-};
-
-const game = new Phaser.Game(config);
-
 // Global Variables
 let score = 0;
 let vaccinesCollected = 0;
 let gameOver = false;
 let gameWon = false;
+
+// Helper Function
+function getRandomEdgePosition(scene) {
+  const edges = ['top', 'bottom', 'left', 'right'];
+  const edge = Phaser.Utils.Array.GetRandom(edges);
+
+  let x, y;
+
+  switch (edge) {
+    case 'top':
+      x = Phaser.Math.Between(0, scene.scale.width);
+      y = 0;
+      break;
+    case 'bottom':
+      x = Phaser.Math.Between(0, scene.scale.width);
+      y = scene.scale.height;
+      break;
+    case 'left':
+      x = 0;
+      y = Phaser.Math.Between(0, scene.scale.height);
+      break;
+    case 'right':
+      x = scene.scale.width;
+      y = Phaser.Math.Between(0, scene.scale.height);
+      break;
+  }
+
+  return { x, y };
+}
 
 // Start Scene
 class StartScene extends Phaser.Scene {
@@ -295,7 +306,12 @@ class GameScene extends Phaser.Scene {
 
     // Decrease spawn rate (increase frequency)
     this.germSpawnRate = Math.max(500, this.germSpawnRate - 200);
-    this.germSpawnEvent.reset({ delay: this.germSpawnRate, callback: this.spawnGerm, callbackScope: this, loop: true });
+    this.germSpawnEvent.reset({
+      delay: this.germSpawnRate,
+      callback: this.spawnGerm,
+      callbackScope: this,
+      loop: true,
+    });
   }
 }
 
@@ -333,7 +349,7 @@ class EndScene extends Phaser.Scene {
     for (let i = 0; i < 50; i++) {
       const x = Phaser.Math.Between(0, this.scale.width);
       const y = Phaser.Math.Between(0, this.scale.height);
-      const germ = this.add.image(x, y, 'tiny-germ').setScale(0.05);
+      this.add.image(x, y, 'tiny-germ').setScale(0.05);
     }
 
     // Random Text
@@ -374,31 +390,21 @@ class EndScene extends Phaser.Scene {
   }
 }
 
-// Helper Function
-function getRandomEdgePosition(scene) {
-  const edges = ['top', 'bottom', 'left', 'right'];
-  const edge = Phaser.Utils.Array.GetRandom(edges);
+// Now define the game configuration and create the game
+const config = {
+  type: Phaser.AUTO,
+  width: window.innerWidth,
+  height: window.innerHeight,
+  parent: 'game-container',
+  physics: {
+    default: 'arcade',
+    arcade: { debug: false },
+  },
+  scale: {
+    mode: Phaser.Scale.RESIZE,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
+  scene: [StartScene, GameScene, EndScene],
+};
 
-  let x, y;
-
-  switch (edge) {
-    case 'top':
-      x = Phaser.Math.Between(0, scene.scale.width);
-      y = 0;
-      break;
-    case 'bottom':
-      x = Phaser.Math.Between(0, scene.scale.width);
-      y = scene.scale.height;
-      break;
-    case 'left':
-      x = 0;
-      y = Phaser.Math.Between(0, scene.scale.height);
-      break;
-    case 'right':
-      x = scene.scale.width;
-      y = Phaser.Math.Between(0, scene.scale.height);
-      break;
-  }
-
-  return { x, y };
-}
+const game = new Phaser.Game(config);
