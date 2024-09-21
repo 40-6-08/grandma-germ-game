@@ -258,7 +258,7 @@ class GameScene extends Phaser.Scene {
 
     // Vaccine disappears after 1 second
     this.time.delayedCall(
-      1000,
+      800,
       () => {
         if (vaccine.active) {
           vaccine.destroy();
